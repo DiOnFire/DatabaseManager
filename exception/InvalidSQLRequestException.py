@@ -1,0 +1,2 @@
+class InvalidSQLRequestException(Exception):
+    pass
