@@ -23,3 +23,11 @@ class SQLTableManager:
             return self.cursor.execute(request).fetchall()
         except Exception:
             return InvalidSQLRequestException
+
+    def get_table_list(self):
+        answer = self.cursor.execute("SELECT name FROM sqlite_master WHERE type='table';").fetchall()
+        return [table[0] for table in answer]
+
+    def get_columns(self, table):
+        answer = self.connection.execute(f"SELECT * FROM {table}")
+        return [description[0] for description in answer.description]

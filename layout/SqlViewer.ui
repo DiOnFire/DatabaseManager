@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1160</width>
-    <height>720</height>
+    <width>1161</width>
+    <height>714</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -63,7 +63,7 @@
      <rect>
       <x>10</x>
       <y>80</y>
-      <width>1141</width>
+      <width>841</width>
       <height>581</height>
      </rect>
     </property>
@@ -91,62 +91,32 @@
      <string>Статус</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_4">
+   <widget class="QTreeWidget" name="treeWidget">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>670</y>
-      <width>41</width>
-      <height>21</height>
+      <x>860</x>
+      <y>80</y>
+      <width>291</width>
+      <height>581</height>
+     </rect>
+    </property>
+    <column>
+     <property name="text">
+      <string notr="true">1</string>
+     </property>
+    </column>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>860</x>
+      <y>60</y>
+      <width>71</width>
+      <height>16</height>
      </rect>
     </property>
     <property name="text">
-     <string>Строки</string>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="stringSpinBox">
-    <property name="geometry">
-     <rect>
-      <x>50</x>
-      <y>670</y>
-      <width>71</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <weight>50</weight>
-      <bold>false</bold>
-     </font>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="columnsSpinBox">
-    <property name="geometry">
-     <rect>
-      <x>180</x>
-      <y>670</y>
-      <width>71</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <weight>50</weight>
-      <bold>false</bold>
-     </font>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_5">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>670</y>
-      <width>51</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Столбцы</string>
+     <string>Структура</string>
     </property>
    </widget>
   </widget>
@@ -181,6 +151,8 @@
     <property name="title">
      <string>Правка</string>
     </property>
+    <addaction name="editAction"/>
+    <addaction name="deleteAction"/>
    </widget>
    <addaction name="fileMenu"/>
    <addaction name="editMenu"/>
@@ -228,6 +200,16 @@
   <action name="action_2">
    <property name="text">
     <string>Размер таблицы...</string>
+   </property>
+  </action>
+  <action name="editAction">
+   <property name="text">
+    <string>Изменение данных...</string>
+   </property>
+  </action>
+  <action name="deleteAction">
+   <property name="text">
+    <string>Удаление данных...</string>
    </property>
   </action>
  </widget>

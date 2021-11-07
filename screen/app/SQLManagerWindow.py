@@ -1,5 +1,5 @@
 from PyQt5 import uic
-from PyQt5.QtWidgets import QWidget, QTableWidgetItem
+from PyQt5.QtWidgets import QWidget, QTableWidgetItem, QTreeWidgetItem
 from api.SQLTableManager import SQLTableManager
 from exception.DatabaseNotFoundException import DatabaseNotFoundException
 from exception.InvalidSQLRequestException import InvalidSQLRequestException
@@ -15,41 +15,59 @@ class SQLManagerWindow(QWidget):
     def __init__(self, database=None):
         super().__init__()
         uic.loadUi('layout/SqlViewer.ui', self)
-        self.init_handlers()
-        self.initUI()
         self.database = "films_db.sqlite"
         self.manager = SQLTableManager(self.database)
         try:
             self.manager.connect_to_database()
         except DatabaseNotFoundException:
-            print("AAAAAAAAA")
+            print("A")
+        self.init_handlers()
+        self.initUI()
+        self.latest_request = ""
+        self.modified = []
+        self.titles = None
 
     def init_handlers(self):
         self.executeRequestButton.clicked.connect(self.execute_request)
-        self.stringSpinBox.valueChanged.connect(self.execute_settings)
-        self.columnsSpinBox.valueChanged.connect(self.execute_settings)
+        self.tableWidget.itemChanged.connect(self.item_changed_handler)
+        self.saveAction.triggered.connect(self.save_table)
 
-    def execute_settings(self):
-        self.tableWidget.setRowCount(self.stringSpinBox.value())
-        self.tableWidget.setColumnCount(self.columnsSpinBox.value())
+        self.treeWidget.setHeaderLabels(["База данных", "Тип"])
+
+        main_tab = QTreeWidgetItem(self.treeWidget, [self.database.split(".")[0] + f" ({self.database})", "База данных"])
+
+        for table in self.manager.get_table_list():
+            tab = QTreeWidgetItem(main_tab, [table, "Таблица"])
+            for id_ in self.manager.get_columns(table):
+                temp = QTreeWidgetItem(tab, [id_, "Столбец"])
+
+    def save_table(self):
+        print(self.modified)
+        if len(self.modified) > 0:
+            for modified in self.modified:
+                data = modified.split(":")
+                request = f"UPDATE {data[0]} SET {data[1]}={data[2]}"
+                self.manager.execute_request(request)
+            self.manager.connection.commit()
+            self.modified.clear()
+        else:
+            pass
 
     def initUI(self):
         global statuses
         self.setFixedSize(1162, 733)
-        self.stringSpinBox.setMaximum(1000000000)
-        self.columnsSpinBox.setMaximum(1000000000)
-        self.stringSpinBox.setMinimum(1)
-        self.columnsSpinBox.setMinimum(1)
         self.setWindowTitle("Database Manager - SQL менеджер")
         self.statusTextBrowser.append(statuses["info"] % "SQL Менеджер запущен!")
 
     def execute_request(self):
+        global statuses
+        self.latest_request = self.requestEdit.text()
         answer = self.manager.execute_request(self.requestEdit.text())
+        self.tableWidget.setColumnCount(1000)
+        self.tableWidget.setRowCount(0)
         if answer == InvalidSQLRequestException:
             self.statusTextBrowser.append(statuses["warning"])
         else:
-            self.tableWidget.setColumnCount(self.columnsSpinBox.value())
-            self.tableWidget.setRowCount(self.stringSpinBox.value())
             for i, row in enumerate(answer):
                 self.tableWidget.setRowCount(
                     self.tableWidget.rowCount() + 1)
@@ -57,4 +75,9 @@ class SQLManagerWindow(QWidget):
                     self.tableWidget.setItem(
                         i, j, QTableWidgetItem(str(elem)))
             self.statusTextBrowser.append(statuses["success"])
-        self.execute_settings()
+
+    def item_changed_handler(self, item):
+        print(item)
+        data = self.latest_request.split()
+        table = [word for word in data if self.manager.get_table_list().count(word) > 0]
+        self.modified.append(f"{table[0]}:{item.column()}:{item.text()}")
