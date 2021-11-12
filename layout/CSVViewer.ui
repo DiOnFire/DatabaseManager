@@ -47,6 +47,29 @@
      <string>Поиск</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="addColumnButton">
+    <property name="geometry">
+     <rect>
+      <x>844</x>
+      <y>10</y>
+      <width>121</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Добавить строку</string>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="spinBox">
+    <property name="geometry">
+     <rect>
+      <x>780</x>
+      <y>11</y>
+      <width>61</width>
+      <height>21</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -62,13 +85,13 @@
      <string>Файл</string>
     </property>
     <addaction name="saveAction"/>
-    <addaction name="saveAsAction"/>
    </widget>
    <widget class="QMenu" name="menu_2">
     <property name="title">
      <string>Правка</string>
     </property>
     <addaction name="deleteAction"/>
+    <addaction name="delEmptyAction"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menu_2"/>
@@ -87,6 +110,11 @@
   <action name="deleteAction">
    <property name="text">
     <string>Удалить выбранные элементы...</string>
+   </property>
+  </action>
+  <action name="delEmptyAction">
+   <property name="text">
+    <string>Удалить пустые строки...</string>
    </property>
   </action>
  </widget>

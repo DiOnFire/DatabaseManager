@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QWidget, QTableWidgetItem, QTreeWidgetItem
 from api.SQLTableManager import SQLTableManager
 from exception.DatabaseNotFoundException import DatabaseNotFoundException
 from exception.InvalidSQLRequestException import InvalidSQLRequestException
+from screen.app.EditTableWindow import EditTableWindow
 
 statuses = {
     "warning": "<span style=\" color: #ff0000;\">%s</span>" % "Невозможно обработать запрос!",
@@ -15,22 +16,25 @@ class SQLManagerWindow(QWidget):
     def __init__(self, database=None):
         super().__init__()
         uic.loadUi('layout/SqlViewer.ui', self)
-        self.database = "films_db.sqlite"
+        self.database = database
         self.manager = SQLTableManager(self.database)
         try:
             self.manager.connect_to_database()
         except DatabaseNotFoundException:
-            print("A")
+            print("error")
         self.init_handlers()
         self.initUI()
         self.latest_request = ""
         self.modified = []
         self.titles = None
 
+    def init_edit_window(self):
+        edit_window = EditTableWindow(self.manager, self.database)
+        edit_window.show()
+
     def init_handlers(self):
         self.executeRequestButton.clicked.connect(self.execute_request)
-        self.tableWidget.itemChanged.connect(self.item_changed_handler)
-        self.saveAction.triggered.connect(self.save_table)
+        self.editAction.triggered.connect(self.init_edit_window)
 
         self.treeWidget.setHeaderLabels(["База данных", "Тип"])
 
@@ -40,18 +44,6 @@ class SQLManagerWindow(QWidget):
             tab = QTreeWidgetItem(main_tab, [table, "Таблица"])
             for id_ in self.manager.get_columns(table):
                 temp = QTreeWidgetItem(tab, [id_, "Столбец"])
-
-    def save_table(self):
-        print(self.modified)
-        if len(self.modified) > 0:
-            for modified in self.modified:
-                data = modified.split(":")
-                request = f"UPDATE {data[0]} SET {data[1]}={data[2]}"
-                self.manager.execute_request(request)
-            self.manager.connection.commit()
-            self.modified.clear()
-        else:
-            pass
 
     def initUI(self):
         global statuses
@@ -75,9 +67,3 @@ class SQLManagerWindow(QWidget):
                     self.tableWidget.setItem(
                         i, j, QTableWidgetItem(str(elem)))
             self.statusTextBrowser.append(statuses["success"])
-
-    def item_changed_handler(self, item):
-        print(item)
-        data = self.latest_request.split()
-        table = [word for word in data if self.manager.get_table_list().count(word) > 0]
-        self.modified.append(f"{table[0]}:{item.column()}:{item.text()}")
